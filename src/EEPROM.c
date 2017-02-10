@@ -31,6 +31,8 @@ static const uint32_t configVersion = 17; // Must be bumped every time config_t 
 config_t cfg;
 
 void initEEPROM(void) {
+    uint32_t rcode;
+    uint32_t version;
     SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0); // Enable EEPROM peripheral
     SysCtlDelay(2); // Insert a few cycles after enabling the peripheral to allow the clock to be fully activated
 
@@ -43,7 +45,7 @@ void initEEPROM(void) {
         while (1);
     }
 
-    uint32_t rcode = EEPROMInit();
+     rcode = EEPROMInit();
     if (rcode) {
 #if UART_DEBUG
         UARTprintf("EEPROMInit error: %u\n", rcode);
@@ -52,7 +54,7 @@ void initEEPROM(void) {
         while (1);
     }
 
-    uint32_t version;
+    
     EEPROMRead(&version, 0, sizeof(version));
     if (version != configVersion) {
         setDefaultConfig();
@@ -62,6 +64,8 @@ void initEEPROM(void) {
 }
 
 void setDefaultConfig(void) {
+ uint8_t axis = 0
+  uint32_t rcode;
     cfg.pidRollPitchValues.Kp = 0.310f;
     cfg.pidRollPitchValues.Ki = 1.65f;
     cfg.pidRollPitchValues.Kd = 0.00040f;
@@ -94,12 +98,12 @@ void setDefaultConfig(void) {
 
     cfg.calibrateESCs = false;
 
-    for (uint8_t axis = 0; axis < 3; axis++) {
+    for (; axis < 3; axis++) {
         cfg.accZero.data[axis] = 0;
         cfg.magZero.data[axis] = 0;
     }
 
-    uint32_t rcode = EEPROMProgram((uint32_t*)&configVersion, 0, sizeof(configVersion)); // Write version number to EEPROM
+      rcode= EEPROMProgram((uint32_t*)&configVersion, 0, sizeof(configVersion)); // Write version number to EEPROM
     if (rcode) {
 #if UART_DEBUG
         UARTprintf("Error writing version number to EEPROM: %u\n", rcode);
